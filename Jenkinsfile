@@ -41,6 +41,7 @@ pipeline {
     CAST_IMG  = "${DOCKER_ID}/cast-service"
   }
 
+
   stages {
     stage('build') {
       environment {
