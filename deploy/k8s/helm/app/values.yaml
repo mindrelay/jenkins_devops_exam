@@ -1,0 +1,7 @@
+certManager:
+  issuerName: letsencrypt
+
+ingress:
+  className: nginx
+  host: app.paul-datascientest.cloud-ip.cc
+  tlsSecretName: letsencrypt-tls

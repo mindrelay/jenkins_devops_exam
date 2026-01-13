@@ -1,0 +1,38 @@
+replicaCount: 1
+
+image:
+  repository: mindrelay/movie-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8000
+
+app:
+  command:
+    - uvicorn
+    - app.main:app
+    - --host
+    - 0.0.0.0
+    - --port
+    - "8000"
+    - --loop
+    - asyncio
+
+castService:
+  hostUrl: http://cast-service:8000/api/v1/casts/
+
+postgresql:
+  image:
+    repository: postgres
+    tag: 12.1-alpine
+    pullPolicy: IfNotPresent
+  service:
+    port: 5432
+  auth:
+    username: movie_db_username
+    password: movie_db_password
+    database: movie_db_dev
+  persistence:
+    size: 1Gi

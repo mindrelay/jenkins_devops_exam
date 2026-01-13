@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cast-service-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cast-service-db
+  template:
+    metadata:
+      labels:
+        app: cast-service-db
+    spec:
+      containers:
+        - name: postgres
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.postgresql.service.port }}
+          envFrom:
+            - secretRef:
+                name: cast-service-db
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cast-service-db

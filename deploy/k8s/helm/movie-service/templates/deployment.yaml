@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-service
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: movie-service
+  template:
+    metadata:
+      labels:
+        app: movie-service
+    spec:
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            {{- toYaml .Values.app.command | nindent 12 }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          env:
+            - name: DATABASE_URI
+              value: {{ printf "postgresql://%s:%s@%s:%v/%s" .Values.postgresql.auth.username .Values.postgresql.auth.password "movie-service-db" .Values.postgresql.service.port .Values.postgresql.auth.database | quote }}
+            - name: CAST_SERVICE_HOST_URL
+              value: {{ .Values.castService.hostUrl | quote }}

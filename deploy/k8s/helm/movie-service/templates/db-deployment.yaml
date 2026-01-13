@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-service-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movie-service-db
+  template:
+    metadata:
+      labels:
+        app: movie-service-db
+    spec:
+      containers:
+        - name: postgres
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.postgresql.service.port }}
+          envFrom:
+            - secretRef:
+                name: movie-service-db
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: movie-service-db

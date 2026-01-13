@@ -1,0 +1,35 @@
+replicaCount: 1
+
+image:
+  repository: mindrelay/cast-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8000
+
+app:
+  command:
+    - uvicorn
+    - app.main:app
+    - --host
+    - 0.0.0.0
+    - --port
+    - "8000"
+    - --loop
+    - asyncio
+
+postgresql:
+  image:
+    repository: postgres
+    tag: 12.1-alpine
+    pullPolicy: IfNotPresent
+  service:
+    port: 5432
+  auth:
+    username: cast_db_username
+    password: cast_db_password
+    database: cast_db_dev
+  persistence:
+    size: 1Gi

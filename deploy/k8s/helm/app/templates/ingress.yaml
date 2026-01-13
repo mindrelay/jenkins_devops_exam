@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gateway
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.certManager.issuerName | quote }}
+spec:
+  ingressClassName: {{ .Values.ingress.className | quote }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host | quote }}
+      secretName: {{ .Values.ingress.tlsSecretName | quote }}
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - path: /api/v1/movies
+            pathType: Prefix
+            backend:
+              service:
+                name: movie-service
+                port:
+                  number: 8000
+          - path: /api/v1/casts
+            pathType: Prefix
+            backend:
+              service:
+                name: cast-service
+                port:
+                  number: 8000
