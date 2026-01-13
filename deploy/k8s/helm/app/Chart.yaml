@@ -1,0 +1,13 @@
+apiVersion: v2
+name: app
+description: App chart
+type: application
+version: 0.1.0
+appVersion: "latest"
+dependencies:
+  - name: movie-service
+    version: 0.1.0
+    repository: "file://../movie-service"
+  - name: cast-service
+    version: 0.1.0
+    repository: "file://../cast-service"
