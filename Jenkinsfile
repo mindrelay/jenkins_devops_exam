@@ -1,4 +1,4 @@
-def deployEnv(String ns) {
+def deploy(String ns) {
   withCredentials([
     usernamePassword(credentialsId: 'MOVIE_DB_CREDENTIALS', usernameVariable: 'MOVIE_DB_USER', passwordVariable: 'MOVIE_DB_PASS'),
     usernamePassword(credentialsId: 'CAST_DB_CREDENTIALS',  usernameVariable: 'CAST_DB_USER',  passwordVariable: 'CAST_DB_PASS'),
@@ -8,6 +8,11 @@ def deployEnv(String ns) {
       set -eu
       chmod 600 "\$KUBECONFIG" || true
       export KUBECONFIG="\$KUBECONFIG"
+
+      kubectl apply -f deploy/k8s/cert-manager/cert-manager-v1.19.2.yaml
+      kubectl -n cert-manager wait --for=condition=Available deploy --all --timeout=180s
+      kubectl apply -f deploy/k8s/cert-manager/clusterissuer.yaml		
+
       kubectl create namespace ${ns} --dry-run=client -o yaml | kubectl apply -f -
 
       kubectl -n ${ns} create secret generic movie-db-secret \\
@@ -41,7 +46,6 @@ pipeline {
     CAST_IMG  = "${DOCKER_ID}/cast-service"
   }
 
-
   stages {
     stage('build') {
       environment {
@@ -63,8 +67,8 @@ pipeline {
           docker build -f movie-service/Dockerfile -t "$MOVIE_IMG:$GIT_COMMIT" ./movie-service
           docker build -f cast-service/Dockerfile -t "$CAST_IMG:$GIT_COMMIT" ./cast-service
 
-          docker push "mindrelay/movie-service:$GIT_COMMIT"
-          docker push "mindrelay/cast-service:$GIT_COMMIT"
+          docker push "$MOVIE_IMG:$GIT_COMMIT"
+          docker push "$CAST_IMG:$GIT_COMMIT"
         '''
       }
     }
@@ -108,7 +112,7 @@ pipeline {
       when { branch 'develop' }
       steps {
         script {
-          deployEnv('dev')
+          deploy('dev')
         }
       }
     }
@@ -117,7 +121,7 @@ pipeline {
       when { branch 'develop' }
       steps {
         script {
-          deployEnv('qa')
+          deploy('qa')
         }
       }
     }
@@ -126,7 +130,7 @@ pipeline {
       when { branch 'develop' }
       steps {
         script {
-          deployEnv('staging')
+          deploy('staging')
         }
       }
     }
@@ -136,7 +140,7 @@ pipeline {
       steps {
         input message: 'Run deploy'
         script {
-          deployEnv('prod')
+          deploy('prod')
         }
       }
     }
