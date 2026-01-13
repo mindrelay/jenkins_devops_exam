@@ -27,9 +27,7 @@ postgresql:
     pullPolicy: IfNotPresent
   service:
     port: 5432
-  auth:
-    username: cast_db_username
-    password: cast_db_password
-    database: cast_db_dev
+  database: cast_db
+  existingSecret: ""
   persistence:
     size: 1Gi

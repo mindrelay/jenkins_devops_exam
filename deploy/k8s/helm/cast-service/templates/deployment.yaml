@@ -21,5 +21,15 @@ spec:
           ports:
             - containerPort: {{ .Values.service.port }}
           env:
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.existingSecret }}
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.postgresql.existingSecret }}
+                  key: password
             - name: DATABASE_URI
-              value: {{ printf "postgresql://%s:%s@%s:%v/%s" .Values.postgresql.auth.username .Values.postgresql.auth.password "cast-service-db" .Values.postgresql.service.port .Values.postgresql.auth.database | quote }}
+              value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@cast-service-db:{{ .Values.postgresql.service.port }}/{{ .Values.postgresql.database }}"

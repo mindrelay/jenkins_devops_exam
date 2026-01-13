@@ -30,9 +30,7 @@ postgresql:
     pullPolicy: IfNotPresent
   service:
     port: 5432
-  auth:
-    username: movie_db_username
-    password: movie_db_password
-    database: movie_db_dev
+  database: movie_db
+  existingSecret: ""
   persistence:
     size: 1Gi
