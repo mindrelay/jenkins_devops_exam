@@ -5,7 +5,7 @@ def deployEnv(String ns) {
     file(credentialsId: 'KUBECONFIG', variable: 'KUBECONFIG')
   ]) {
     sh """
-      set -euo pipefail
+      set -eu
       chmod 600 "\$KUBECONFIG" || true
       export KUBECONFIG="\$KUBECONFIG"
       kubectl create namespace ${ns} --dry-run=client -o yaml | kubectl apply -f -
@@ -56,7 +56,7 @@ pipeline {
       }
       steps {
         sh '''
-          set -euo pipefail
+          set -eu
           echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKER_ID" --password-stdin
   
           docker build -f movie-service/Dockerfile -t "$MOVIE_IMG:$GIT_COMMIT" ./movie-service
@@ -79,7 +79,7 @@ pipeline {
       }
       steps {
         sh '''
-          set -euo pipefail
+          set -eu
           docker compose -p ci -f deploy/docker-compose.ci.yml pull
           docker compose -p ci -f deploy/docker-compose.ci.yml up -d
 
