@@ -2,6 +2,6 @@ certManager:
   issuerName: letsencrypt
 
 ingress:
-  className: nginx
+  className: traefik
   host: app.paul-datascientest.cloud-ip.cc
   tlsSecretName: letsencrypt-tls
