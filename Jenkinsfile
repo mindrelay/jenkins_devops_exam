@@ -40,7 +40,6 @@ def deploy(String ns) {
 pipeline {
   agent any
 
-
   environment {
     DOCKER_ID = "mindrelay"
     MOVIE_IMG = "${DOCKER_ID}/movie-service"
