@@ -1,16 +1,17 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: cast-service-db
+  name: movie-service-db
 spec:
   replicas: 1
+  serviceName: movie-service-db
   selector:
     matchLabels:
-      app: cast-service-db
+      app: movie-service-db
   template:
     metadata:
       labels:
-        app: cast-service-db
+        app: movie-service-db
     spec:
       containers:
         - name: postgres
@@ -34,7 +35,12 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/lib/postgresql/data
-      volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: cast-service-db
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.postgresql.persistence.size }}
