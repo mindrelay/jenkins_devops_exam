@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: cast-service-db
 spec:
-  type: ClusterIP
+  clusterIP: None
   ports:
     - port: {{ .Values.postgresql.service.port }}
       targetPort: {{ .Values.postgresql.service.port }}
